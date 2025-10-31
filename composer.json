@@ -1,0 +1,21 @@
+{
+  "name": "bethinkstudio/bethink-safety-net",
+  "description": "A WordPress plugin for site safety checks and details.",
+  "type": "project",
+  "require": {
+    "php": ">=8.3",
+    "ext-json": "*",
+    "wp-coding-standards/wpcs": "^3",
+    "phpcompatibility/phpcompatibility-wp": "*",
+    "johnbillion/wp-compat": "^1"
+  },
+  "scripts": {
+    "phpcs": "phpcs --standard=./.phpcs.xml . -v",
+    "phpcbf": "phpcbf --standard=./.phpcs.xml . -v"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "bethink-safety-net",
+  "version": "1.0.0",
+  "description": "A WordPress plugin for site safety checks and details.",
+  "main": "bethink-safety-net.php",
+  "scripts": {
+    "build-zip": "wp-scripts plugin-zip"
+  },
+  "author": "George Stephanis",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "@wordpress/scripts": "^27.1.0"
+  }
+}
