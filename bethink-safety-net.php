@@ -19,4 +19,5 @@ require_once __DIR__ . '/inc/functions.php';
 
 if ( have_site_details_changed() ) {
 	require_once __DIR__ . '/inc/tmpl-detected-changed-details.php';
+	exit;
 }
