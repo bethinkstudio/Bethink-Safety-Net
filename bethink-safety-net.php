@@ -16,8 +16,15 @@
 namespace Bethink\SafetyNet;
 
 require_once __DIR__ . '/inc/functions.php';
+require_once __DIR__ . '/inc/admin.php';
 
 if ( have_site_details_changed() ) {
-	require_once __DIR__ . '/inc/tmpl-detected-changed-details.php';
-	exit;
+	if ( empty( get_stored_site_details() ) ) {
+		// First run, store the details.
+		store_site_details();
+	} else {
+		// Details have changed, show warning.
+		require_once __DIR__ . '/inc/tmpl-detected-changed-details.php';
+		exit;
+	}
 }

@@ -50,24 +50,24 @@ header( 'Content-Type: text/html; charset=utf-8' );
 	<table>
 		<thead>
 			<tr>
-				<th scope="col"><?php esc_html_e( 'Detail', 'safetynet' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'Key', 'safetynet' ); ?></th>
 				<th scope="col"><?php esc_html_e( 'Previous Value', 'safetynet' ); ?></th>
 				<th scope="col"><?php esc_html_e( 'Current Value', 'safetynet' ); ?></th>
 			</tr>
 		</thead>
 		<tfoot>
 			<tr>
-				<th scope="col"><?php esc_html_e( 'Detail', 'safetynet' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'Key', 'safetynet' ); ?></th>
 				<th scope="col"><?php esc_html_e( 'Previous Value', 'safetynet' ); ?></th>
 				<th scope="col"><?php esc_html_e( 'Current Value', 'safetynet' ); ?></th>
 			</tr>
 		</tfoot>
 		<tbody>
-			<?php foreach ( $bsn_changes as $bsn_detail => $bsn_values ) : ?>
+			<?php foreach ( $bsn_changes['current'] as $bsn_detail_key => $bsn_values_current ) : ?>
 				<tr>
-					<th scope="row"><?php echo esc_html( $bsn_detail ); ?></th>
-					<td><?php echo esc_html( $bsn_values['previous'] ); ?></td>
-					<td><?php echo esc_html( $bsn_values['current'] ); ?></td>
+					<th scope="row"><?php echo esc_html( $bsn_detail_key ); ?></th>
+					<td><?php echo esc_html( $bsn_changes['previous'][ $bsn_detail_key ] ); ?></td>
+					<td><?php echo esc_html( $bsn_values_current ); ?></td>
 				</tr>
 			<?php endforeach; ?>
 		</tbody>

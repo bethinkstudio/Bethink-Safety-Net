@@ -92,7 +92,7 @@ function have_site_details_changed( $details = false ) {
  *
  * @return void
  */
-function update_site_details() {
+function store_site_details() {
 	update_option( SITE_DETAILS_OPTION, get_site_details() );
 	update_option( SITE_DETAILS_OPTION_HASH, get_site_details_hash() );
 }
