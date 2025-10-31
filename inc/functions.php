@@ -77,7 +77,7 @@ function have_site_details_changed( $details = false ) {
 			return array(
 				'current' => $site_details,
 				'stored'  => $stored_site_details,
-				'diff'    => array_diff_assoc( $site_details, $stored_site_details ),
+				'diff'    => array_diff_assoc( $site_details, (array) $stored_site_details ),
 			);
 		}
 
