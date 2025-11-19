@@ -36,7 +36,7 @@ function get_site_details() {
 	$site_details['opt_siteurl']     = get_option( 'siteurl' );
 	$site_details['abspath']         = ABSPATH;
 	$site_details['server_hostname'] = gethostname();
-	$site_details['server_ip']       = $_SERVER['SERVER_ADDR'];
+	$site_details['server_ip']       = $_SERVER['SERVER_ADDR'] ?? 'unknown';
 	$site_details['db']              = sprintf(
 		'👤 %1$s 🌐 %2$s ⛃ %3$s',
 		defined( 'DB_USER' ) ? DB_USER : '',
@@ -95,4 +95,51 @@ function have_site_details_changed( $details = false ) {
 function store_site_details() {
 	update_option( SITE_DETAILS_OPTION, get_site_details() );
 	update_option( SITE_DETAILS_OPTION_HASH, get_site_details_hash() );
+}
+
+/**
+ * Generate a nonce for security verification.
+ *
+ * @param string $type Type of nonce: 'stored' or 'live'.
+ * @return string Nonce string.
+ */
+function get_nonce( $type ) {
+	switch( $type ) {
+		case 'stored':
+			return sha1(
+				implode(
+					'|',
+					array(
+						get_current_user_id(),
+						get_stored_site_details_hash(),
+						ceil( time() / DAY_IN_SECONDS ),
+					)
+				)
+			);
+		case 'live':
+			return sha1(
+				implode(
+					'|',
+					array(
+						get_current_user_id(),
+						get_site_details_hash(),
+						ceil( time() / DAY_IN_SECONDS ),
+					)
+				)
+			);
+		default:
+			return '';
+	}
+}
+
+/**
+ * Implement environment limits and trigger the appropriate action hook.
+ *
+ * @return void
+ */
+function implement_environment_limits() {
+	/**
+	 * Any post wrap-up actions to implement environment limits can be hooked here.
+	 */
+	do_action( 'bsn_implement_environment_limits' );
 }
