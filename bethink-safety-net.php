@@ -43,6 +43,8 @@ if ( have_site_details_changed() ) {
 		} else {
 			wp_die( esc_html__( 'Security check failed.', 'safetynet' ) );
 		}
+	} elseif ( defined( 'BSN_ACKNOWLEDGE_CHANGES' ) && hash_equals( BSN_ACKNOWLEDGE_CHANGES, get_site_details_hash() ) ) {
+		implement_environment_limits();
 	// Handle limitations form submission.
 	} elseif ( isset( $_POST['bsn_implement_limits'] ) ) {
 		if ( hash_equals(
@@ -54,13 +56,22 @@ if ( have_site_details_changed() ) {
 		} else {
 			wp_die( esc_html__( 'Security check failed.', 'safetynet' ) );
 		}
+	} elseif ( defined( 'BSN_IMPLEMENT_LIMITS' ) && hash_equals( BSN_IMPLEMENT_LIMITS, get_stored_site_details_hash() ) ) {
+		implement_environment_limits();
 	// Site details have changed, show warning and prompt user!
 	} else {
 		if ( current_user_can( 'manage_options' ) ) {
 			require_once __DIR__ . '/inc/tmpl-detected-changed-details.php';
 			exit;
 		}
+		$constants = sprintf(
+			'To indicate this is the correct production environment, <code>define( \'BSN_ACKNOWLEDGE_CHANGES\', \'%1$s\' );</code> or to configure this as a development environment, <code>define( \'BSN_IMPLEMENT_LIMITS\', \'%2$s\' );</code>',
+			get_site_details_hash(),
+			get_stored_site_details_hash()
+		);
+		error_log( 'Bethink Safety Net: Site details have changed. To acknowledge changes or implement limits, define one of the following constants in <code>wp-config.php</code>: ' . $constants );
+
 		// For non-admin users, block access and show message.
-		wp_die( esc_html__( 'Site details have changed. Please contact a site administrator.', 'safetynet' ) );
+		wp_die( sprintf( __( 'Site details have changed. Please contact a site administrator. <!-- %s -->', 'safetynet' ), $constants ) );
 	}
 }
