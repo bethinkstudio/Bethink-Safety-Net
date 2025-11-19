@@ -16,7 +16,7 @@ add_action( 'admin_menu', __NAMESPACE__ . '\bsn_add_tools_page' );
 function bsn_add_tools_page() {
 	add_management_page(
 		__( 'Safety Net Site Details', 'safetynet' ),
-		__( 'Safety Net', 'safetynet' ),
+		__( 'Bethink Safety Net', 'safetynet' ),
 		'manage_options',
 		'bsn-site-details',
 		__NAMESPACE__ . '\bsn_render_tools_page'

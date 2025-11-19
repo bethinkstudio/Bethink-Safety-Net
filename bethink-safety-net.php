@@ -18,7 +18,20 @@ namespace Bethink\SafetyNet;
 require_once __DIR__ . '/inc/functions.php';
 require_once __DIR__ . '/inc/admin.php';
 
+if ( get_option( 'bsn_limits_implemented', false ) ) {
+	require_once __DIR__ . '/to51-safetynet/safety-net.php';
+	return;
+}
+
 if ( have_site_details_changed() ) {
+	if ( empty( get_stored_site_details() ) ) {
+		// First run, store the details.
+		store_site_details();
+		return;
+	}
+
+	require_once ABSPATH . WPINC . '/pluggable.php';
+
 	// Handle acceptance form submission.
 	if ( isset( $_POST['bsn_acknowledge_changes'] ) ) {
 		if ( hash_equals(
@@ -41,10 +54,6 @@ if ( have_site_details_changed() ) {
 		} else {
 			wp_die( esc_html__( 'Security check failed.', 'safetynet' ) );
 		}
-	// Handle initial storage for change detection.
-	} elseif ( empty( get_stored_site_details() ) ) {
-		// First run, store the details.
-		store_site_details();
 	// Site details have changed, show warning and prompt user!
 	} else {
 		if ( current_user_can( 'manage_options' ) ) {
@@ -52,6 +61,6 @@ if ( have_site_details_changed() ) {
 			exit;
 		}
 		// For non-admin users, block access and show message.
-		wp_die( esc_html__( 'Site details have changed. Please contact the site administrator.', 'safetynet' ) );
+		wp_die( esc_html__( 'Site details have changed. Please contact a site administrator.', 'safetynet' ) );
 	}
 }
