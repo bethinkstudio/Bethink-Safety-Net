@@ -139,6 +139,7 @@ function get_nonce( $type ) {
  */
 function implement_environment_limits() {
 	update_option( 'bsn_limits_implemented', true );
+	putenv( 'WP_ENVIRONMENT_TYPE=development' );
 	require_once __DIR__ . '/../to51-safetynet/safety-net.php';
 
 	/**
