@@ -138,6 +138,8 @@ function get_nonce( $type ) {
  * @return void
  */
 function implement_environment_limits() {
+	include_once __DIR__ . '/../to51-safetynet/safety-net.php';
+
 	/**
 	 * Any post wrap-up actions to implement environment limits can be hooked here.
 	 */
