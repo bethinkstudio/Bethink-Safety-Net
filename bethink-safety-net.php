@@ -16,7 +16,10 @@
 namespace Bethink\SafetyNet;
 
 require_once __DIR__ . '/inc/functions.php';
-require_once __DIR__ . '/inc/admin.php';
+
+if ( is_admin() ) {
+	require_once __DIR__ . '/inc/admin.php';
+}
 
 if ( get_option( 'bsn_limits_implemented', false ) ) {
 	require_once __DIR__ . '/to51-safetynet/safety-net.php';
@@ -38,21 +41,55 @@ if ( have_site_details_changed() ) {
 			sanitize_text_field( wp_unslash( $_POST['bsn_acknowledge_changes'] ) ),
 			get_nonce( 'live' )
 		) ) {
-			// User has acknowledged changes, update stored details.
-			store_site_details();
+			if ( current_user_can( 'manage_options' ) ) {
+				// User has acknowledged changes, update stored details.
+				store_site_details();
+			} elseif ( isset( $_POST['bsn_username'], $_POST['bsn_password'] ) ) {
+				$user = wp_authenticate(
+					sanitize_text_field( wp_unslash( $_POST['bsn_username'] ) ),
+					sanitize_text_field( wp_unslash( $_POST['bsn_password'] ) )
+				);
+				if ( is_wp_error( $user ) ) {
+					wp_die( esc_html__( 'Authentication failed. Please check your credentials and try again.', 'safetynet' ) );
+				}
+				if ( ! user_can( $user, 'manage_options' ) ) {
+					wp_die( esc_html__( 'You do not have sufficient permissions to perform this action.', 'safetynet' ) );
+				}
+				// User has acknowledged changes, update stored details.
+				store_site_details();
+				wp_safe_redirect( admin_url() );
+				exit;
+			}
 		} else {
 			wp_die( esc_html__( 'Security check failed.', 'safetynet' ) );
 		}
 	} elseif ( defined( 'BSN_ACKNOWLEDGE_CHANGES' ) && hash_equals( BSN_ACKNOWLEDGE_CHANGES, get_site_details_hash() ) ) {
-		implement_environment_limits();
+		store_site_details();
 	// Handle limitations form submission.
 	} elseif ( isset( $_POST['bsn_implement_limits'] ) ) {
 		if ( hash_equals(
 			sanitize_text_field( wp_unslash( $_POST['bsn_implement_limits'] ) ),
 			get_nonce( 'stored' )
 		) ) {
-			// User has requested to implement limits.
-			implement_environment_limits();
+			if ( current_user_can( 'manage_options' ) ) {
+				// User has requested to implement limits.
+				implement_environment_limits();
+			} elseif ( isset( $_POST['bsn_username'], $_POST['bsn_password'] ) ) {
+				$user = wp_authenticate(
+					sanitize_text_field( wp_unslash( $_POST['bsn_username'] ) ),
+					sanitize_text_field( wp_unslash( $_POST['bsn_password'] ) )
+				);
+				if ( is_wp_error( $user ) ) {
+					wp_die( esc_html__( 'Authentication failed. Please check your credentials and try again.', 'safetynet' ) );
+				}
+				if ( ! user_can( $user, 'manage_options' ) ) {
+					wp_die( esc_html__( 'You do not have sufficient permissions to perform this action.', 'safetynet' ) );
+				}
+				// User has requested to implement limits.
+				implement_environment_limits();
+				wp_safe_redirect( admin_url() );
+				exit;
+			}
 		} else {
 			wp_die( esc_html__( 'Security check failed.', 'safetynet' ) );
 		}
@@ -64,14 +101,7 @@ if ( have_site_details_changed() ) {
 			require_once __DIR__ . '/inc/tmpl-detected-changed-details.php';
 			exit;
 		}
-		$constants = sprintf(
-			'To indicate this is the correct production environment, <code>define( \'BSN_ACKNOWLEDGE_CHANGES\', \'%1$s\' );</code> or to configure this as a development environment, <code>define( \'BSN_IMPLEMENT_LIMITS\', \'%2$s\' );</code>',
-			get_site_details_hash(),
-			get_stored_site_details_hash()
-		);
-		error_log( 'Bethink Safety Net: Site details have changed. To acknowledge changes or implement limits, define one of the following constants in <code>wp-config.php</code>: ' . $constants );
-
-		// For non-admin users, block access and show message.
-		wp_die( sprintf( __( 'Site details have changed. Please contact a site administrator. <!-- %s -->', 'safetynet' ), $constants ) );
+		require_once __DIR__ . '/inc/tmpl-detected-changes-unauthed.php';
+		exit;
 	}
 }
